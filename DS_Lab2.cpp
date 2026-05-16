@@ -18,7 +18,6 @@ using namespace std;
 using namespace std::chrono;
 
 double calculateComplexity(int n) {
-    // 8 операций (FLOP) на одну итерацию комплексного умножения-сложения
     return 8.0 * pow(n, 3);
 }
 
@@ -48,7 +47,6 @@ double calculateFrobeniusNormDiff(int N, const complex<float>* MatrixA, const co
     return sqrt(sum_sq);
 }
 
-// Указатель на функцию, принимающую ссылки на std::vector
 typedef void (*matmul_func_ptr)(int,
     const std::vector<std::complex<float>>&,
     const std::vector<std::complex<float>>&,
@@ -78,7 +76,6 @@ int main() {
     SetConsoleCP(1251);
     SetConsoleOutputCP(1251);
 
-    // 1. Сразу при старте определяем лучшее доступное ядро
     static const matmul_func_ptr run_optimized_matmul = select_best_matmul();
     if (run_optimized_matmul == nullptr) {
         return -1;
@@ -114,7 +111,6 @@ int main() {
     double init_time = duration_cast<microseconds>(init_stop - init_start).count() / 1e6;
     cout << "-> Инициализация завершена за: " << init_time << " сек.\n" << endl;
 
-    // === Запуск BLAS ===
     cout << "2. Запуск cblas_cgemm (Вариант 2)..." << endl;
     auto start = high_resolution_clock::now();
     multiplyMatricesBLAS(A_flat, B_flat, C_blas, n);
@@ -122,23 +118,19 @@ int main() {
     double timeSecondVariant = duration_cast<microseconds>(stop - start).count() / 1e6;
     cout << "-> BLAS завершил работу за: " << timeSecondVariant << " сек.\n" << endl;
 
-    // === Запуск Выбранного Векторного Ядра ===
     cout << "3. Запуск оптимизированного ручного алгоритма (Вариант 3)..." << endl;
     start = high_resolution_clock::now();
 
-    // Передаем сами векторы, без .data(), так как диспетчер работает со ссылками
     run_optimized_matmul(n, A_flat, B_flat, C_opt);
 
     stop = high_resolution_clock::now();
     double timeThirdVariant = duration_cast<microseconds>(stop - start).count() / 1e6;
     cout << "-> Ручной алгоритм завершил работу за: " << timeThirdVariant << " сек.\n" << endl;
 
-    // === Сравнение матриц ===
     cout << "4. Проверка точности вычислений..." << endl;
     double norm_diff = calculateFrobeniusNormDiff(n, C_blas.data(), C_opt.data());
     cout << "-> Норма Фробениуса разности матриц: " << norm_diff << endl;
 
-    // Расчет метрик производительности
     double complexity = calculateComplexity(n);
     double performanceSecondVariant = calculatePerformance(complexity, timeSecondVariant);
     double performanceThirdVariant = calculatePerformance(complexity, timeThirdVariant);
