@@ -23,3 +23,6 @@
 
 Однако! Если запускать программу из Visual Studio, BLAS почему-то работает в 3 раза медленнее, и получается такая забавная картина:
 <img width="742" height="521" alt="image" src="https://github.com/user-attachments/assets/52e8490d-5ab2-425f-a6a6-1aae482ada88" />
+
+
+Но это на моём процессоре, поддерживающем AVX512.
