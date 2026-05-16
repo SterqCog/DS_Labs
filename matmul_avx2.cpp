@@ -23,7 +23,7 @@ void matmul_avx2(int N,
             for (int sj = 0; sj < N; sj += BLOCK_SIZE) {
 
                 for (int i = si; i < si + BLOCK_SIZE; i += 4) {
-                    for (int k = sk; k < std::min(sk + BLOCK_SIZE, N); ++k) {
+                    for (int k = sk; k < sk + BLOCK_SIZE; ++k) {
 
                         float ar0 = A_f[2 * (i * N + k)];
                         float ai0 = A_f[2 * (i * N + k) + 1];
@@ -45,7 +45,7 @@ void matmul_avx2(int N,
                         __m256 vec_ar3 = _mm256_set1_ps(ar3);
                         __m256 vec_ai3 = _mm256_set1_ps(ai3);
 
-                        int j_limit = std::min(sj + BLOCK_SIZE, N);
+                        int j_limit = sj + BLOCK_SIZE;
 
                         for (int j = sj; j < j_limit; j += 4) {
                             int b_idx = 2 * (k * N + j);
