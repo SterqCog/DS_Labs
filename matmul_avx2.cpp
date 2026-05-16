@@ -9,12 +9,10 @@ void matmul_avx2(int N,
 {
     const int BLOCK_SIZE = 64;
 
-    // Извлекаем сырые указатели на float из векторов
     const float* A_f = reinterpret_cast<const float*>(A.data());
     const float* B_f = reinterpret_cast<const float*>(B.data());
     float* C_f = reinterpret_cast<float*>(C.data());
 
-    // Обнуляем матрицу C локально перед расчетами (опционально, но безопасно)
     std::fill(C_f, C_f + 2 * N * N, 0.0f);
 
     __m256 sign_mask = _mm256_setr_ps(-0.0f, 0.0f, -0.0f, 0.0f, -0.0f, 0.0f, -0.0f, 0.0f);
@@ -55,7 +53,6 @@ void matmul_avx2(int N,
                             __m256 vec_b = _mm256_loadu_ps(&B_f[b_idx]);
                             __m256 vec_b_shuf = _mm256_shuffle_ps(vec_b, vec_b, _MM_SHUFFLE(2, 3, 0, 1));
 
-                            // --- СТРОКА 0 ---
                             int c_idx0 = 2 * (i * N + j);
                             __m256 vec_c0 = _mm256_loadu_ps(&C_f[c_idx0]);
                             vec_c0 = _mm256_fmadd_ps(vec_ar0, vec_b, vec_c0);
@@ -64,7 +61,6 @@ void matmul_avx2(int N,
                             vec_c0 = _mm256_add_ps(vec_c0, i_term0);
                             _mm256_storeu_ps(&C_f[c_idx0], vec_c0);
 
-                            // --- СТРОКА 1 ---
                             int c_idx1 = 2 * ((i + 1) * N + j);
                             __m256 vec_c1 = _mm256_loadu_ps(&C_f[c_idx1]);
                             vec_c1 = _mm256_fmadd_ps(vec_ar1, vec_b, vec_c1);
@@ -73,7 +69,6 @@ void matmul_avx2(int N,
                             vec_c1 = _mm256_add_ps(vec_c1, i_term1);
                             _mm256_storeu_ps(&C_f[c_idx1], vec_c1);
 
-                            // --- СТРОКА 2 ---
                             int c_idx2 = 2 * ((i + 2) * N + j);
                             __m256 vec_c2 = _mm256_loadu_ps(&C_f[c_idx2]);
                             vec_c2 = _mm256_fmadd_ps(vec_ar2, vec_b, vec_c2);
@@ -82,7 +77,6 @@ void matmul_avx2(int N,
                             vec_c2 = _mm256_add_ps(vec_c2, i_term2);
                             _mm256_storeu_ps(&C_f[c_idx2], vec_c2);
 
-                            // --- СТРОКА 3 ---
                             int c_idx3 = 2 * ((i + 3) * N + j);
                             __m256 vec_c3 = _mm256_loadu_ps(&C_f[c_idx3]);
                             vec_c3 = _mm256_fmadd_ps(vec_ar3, vec_b, vec_c3);
