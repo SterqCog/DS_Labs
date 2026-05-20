@@ -18,7 +18,7 @@ using namespace std;
 using namespace std::chrono;
 
 double calculateComplexity(int n) {
-    return 8.0 * pow(n, 3);
+    return 2.0 * pow(n, 3);
 }
 
 double calculatePerformance(double complexity, double timeInSeconds) {
